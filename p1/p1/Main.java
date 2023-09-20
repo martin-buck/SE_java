@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class Main {
 
     // Run "java -ea Main" to run with assertions enabled (If you run
@@ -35,7 +37,22 @@ public class Main {
 	assert !g.hasEdge("a", "b");
 	assert g.hasNode("a");
 	assert g.hasNode("b");
-    }
+
+	// test succ and nodes
+	assert g.addEdge("a", "b");
+	assert g.succ("a").contains("b");
+	assert g.addNode("c");
+	assert g.addEdge("a", "c");
+	assert g.succ("a").contains("c");
+	
+	// test nodes
+	assert g.nodes().contains("a");
+	assert g.nodes().contains("b");
+	assert g.nodes().contains("c");
+
+	// test pred
+	assert g.pred("c").contains("a");
+	}
 
     public static void test2() {
 	Graph g = new ListGraph();
@@ -44,10 +61,52 @@ public class Main {
 	assert eg.addEdge(e);
 	assert eg.hasEdge(e);
     }
+
+	// test union on two ListGraph
+	public static void test3() {
+	Graph g = new ListGraph();
+	Graph h = new ListGraph();
+
+	assert g.addNode("a");
+	assert g.addNode("b");
+	assert g.addNode("c");
+	assert g.addEdge("a", "b");
+	assert g.addEdge("a", "c");
+
+	assert h.addNode("d");
+
+	assert g.union(h).hasNode("d");
+	assert h.union(g).hasNode("d");
+	assert g.union(h).hasEdge("a", "b");
+	}
+
+	// test union on a general Graph
+	public static void test4(){
+		Graph g = new ListGraph();
+		
+		assert g.addNode("a");
+		assert g.addNode("b");
+		assert g.addNode("c");
+		assert g.addNode("d");
+		assert g.addEdge("a", "b");
+		assert g.addEdge("a", "c");
+		assert g.addEdge("c", "d");
+		assert g.addEdge("d", "a");
+
+		HashSet<String> nodeSet = new HashSet<String>();
+		nodeSet.add("a");
+		nodeSet.add("d");
+		assert g.subGraph(nodeSet).hasNode("a");
+		assert g.subGraph(nodeSet).hasNode("d");
+		assert g.subGraph(nodeSet).hasEdge("d", "a");
+		assert !g.subGraph(nodeSet).hasEdge("a", "d");
+	}
     
     public static void main(String[] args) {
 	test1();
 	// test2();
+	test3();
+	test4();
     }
 
 }
