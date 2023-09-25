@@ -5,32 +5,33 @@ public class ListGraph implements Graph {
     // it is a private field
     private HashMap<String, LinkedList<String>> nodes = new HashMap<>();
 
+    // add node to the nodes HashMap representing our graph
     public boolean addNode(String n) {
 	    boolean added = false;
+        // if n is not present as a key, add with a new empty linked list
         if (!this.hasNode(n)){
             this.nodes.put(n, new LinkedList<String>());
             added = true;
         }
         return added;
     }
+    
+    // add an edge between two nodes if both are present
+    public boolean addEdge(String n1, String n2) {        
+        boolean edgeAdded = false;
 
-    public boolean addEdge(String n1, String n2) {
-	     boolean added = true;
-
+        // throw an exception if both nodes are not present
          if (this.hasNode(n1) && this.hasNode(n2)){
-            for (String n : this.nodes.get(n1)) {
-                if (n.equals(n2)){
-                    added = false;
-                }
-            }
-            if (added){
+            boolean edgePresent = this.hasEdge(n1, n2);
+            if (!edgePresent){
                 nodes.get(n1).add(n2);
+                edgeAdded = true;
             }
          }
          else{
             throw new NoSuchElementException();
          }
-         return added;
+         return edgeAdded;
     }
 
     public boolean hasNode(String n) {
@@ -41,7 +42,7 @@ public class ListGraph implements Graph {
         boolean nodeFlag = false;
 
         if (this.hasNode(n1) && this.hasNode(n2)){
-            for (String n : this.nodes.get(n1)) {
+            for (String n : this.succ(n1)) {
                 if (n.equals(n2)){
                     nodeFlag = true;
                 }
@@ -53,8 +54,8 @@ public class ListGraph implements Graph {
     public boolean removeNode(String n) {
 	     if (this.hasNode(n)){
             this.nodes.remove(n);
-            for (String n1 : this.nodes.keySet()){
-                this.nodes.get(n1).remove(n);
+            for (String n1 : this.nodes()){
+                this.succ(n1).remove(n);
             }
             return true;
          }
@@ -64,10 +65,10 @@ public class ListGraph implements Graph {
     }
 
     public boolean removeEdge(String n1, String n2) {
-	    if (this.hasEdge(n1, n2)){
-            for (String n : this.nodes.get(n1)) {
+	    if (this.hasNode(n1) && this.hasNode(n2)){
+            for (String n : this.succ(n1)) {
                 if (n.equals(n2)){
-                    nodes.get(n1).remove(n);
+                    this.succ(n1).remove(n);
                     return true;
                 }
             }
@@ -116,9 +117,11 @@ public class ListGraph implements Graph {
         return preds;
     }
 
+    // create a new graph that has all the nodes and edges of this graph and argument graph
     public Graph union(Graph g) {
 	    Graph h = new ListGraph();
         
+        // add nodes from both graphs
         for (String s : this.nodes()){
             h.addNode(s);
         }
@@ -126,6 +129,7 @@ public class ListGraph implements Graph {
             h.addNode(s);
         }
 
+        // add edges from both graphs
         for (String s1 : this.nodes()){
             for (String s2: this.succ(s1)){
                 h.addEdge(s1, s2);
@@ -138,7 +142,7 @@ public class ListGraph implements Graph {
         }
         return h;
     }
-
+    
     public Graph subGraph(Set<String> nodes) {
 	     Graph g = new ListGraph();
          // iterate through current graph objects nodes
@@ -147,6 +151,7 @@ public class ListGraph implements Graph {
                 g.addNode(n1);
                 for (String n2 : this.succ(n1)){
                     if (nodes.contains(n2)){
+                        g.addNode(n2);
                         g.addEdge(n1, n2);
                     }
                 }
@@ -156,8 +161,39 @@ public class ListGraph implements Graph {
     }
 
     public boolean connected(String n1, String n2) {
+        // if the two strings are equal the designated behavior is return true
 	    if (n1.equals(n2)){
             return true;
+        }
+        // if either node is not in the graph, throw exception
+        else if (!this.hasNode(n1) || !this.hasNode(n2)){
+            throw new NoSuchElementException();
+        }
+        // do a DFS to see if there is a path from n1 to n2
+        else{
+            // a stack and a map indicated if a node has been visited
+            ArrayList<String> stack = new ArrayList<String>();
+            HashMap<String, String> marked = new HashMap<String, String>();
+
+            // set the initial status for all nodes
+            for (String n: this.nodes()){
+                marked.put(n, new String());
+            }
+
+            // add n1 to the stack and perform the DFS
+            stack.add(n1);
+            while (!stack.isEmpty()){
+                String n = stack.remove(0);
+                if (n.equals(n2)){
+                    return true;
+                }
+                else if (!marked.get(n).equals("visited")){
+                    marked.put(n, "visited");
+                    for (String m : this.succ(n)){
+                        stack.add(m);
+                    }
+                }
+            }
         }
         return false;
     }
