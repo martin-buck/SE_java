@@ -72,19 +72,19 @@ public class Main {
 	Graph g = new ListGraph();
 	EdgeGraph eg = new EdgeGraphAdapter(g);
 	Edge e = new Edge("a", "b");
+	Edge f = new Edge("a", "c");
 	assert eg.addEdge(e);
 	assert eg.hasEdge(e);
 	assert !eg.addEdge(e);
 	assert eg.hasNode("a");
 	assert eg.hasNode("b");
 	assert !eg.hasNode("c");
-
-	Edge f = new Edge("a", "c");
-	Edge h = new Edge("b", "a");
-
+	assert !eg.hasEdge(f);
+	
 	assert eg.addEdge(f);
 	assert eg.hasNode("c");
 	assert eg.removeEdge(f);
+	assert !eg.removeEdge(f);
 	assert !eg.hasEdge(f);
 	assert eg.hasNode("a");
 	assert !eg.hasNode("c");
@@ -106,6 +106,17 @@ public class Main {
 	assert g.union(h).hasNode("d");
 	assert h.union(g).hasNode("d");
 	assert g.union(h).hasEdge("a", "b");
+	assert g.union(h).hasEdge("a", "c");
+
+	assert h.addNode("c");
+	assert h.addEdge("d", "c");
+	assert h.addNode("a");
+	assert h.addEdge("a", "c");
+
+	assert !g.union(h).hasEdge("d", "a");
+	assert g.union(h).hasEdge("d", "c");
+	assert g.union(h).hasEdge("a", "c");
+	assert !g.union(h).hasEdge("a", "a");
 	}
 
 	// test union on a general Graph
@@ -132,6 +143,7 @@ public class Main {
 		nodeSet.add("d");
 		assert g.subGraph(nodeSet).hasEdge("d", "a");
 		assert g.subGraph(nodeSet).hasEdge("c", "d");
+		assert g.subGraph(new HashSet<String>()).nodes().isEmpty();
 	}
 	
 	// test outEdges and inEdges and edges methods for EdgeGraphAdapter
@@ -151,12 +163,14 @@ public class Main {
 		succs1.add(e);
 		succs1.add(f);
 		assert eg.outEdges("a").containsAll(succs1);
+		assert !eg.outEdges("a").containsAll(preds1);
 		assert eg.inEdges("a").containsAll(preds1);
+		assert !eg.inEdges("a").containsAll(succs1);
 		assert eg.edges().containsAll(succs1);
 		assert eg.edges().containsAll(preds1);
 	}
 
-	// test hasPath from EdgeGraphAdapter
+	// test hasPath from EdgeGraphAdapter. Succesfully throws exception
 	public static void test6(){
 		Graph g = new ListGraph();
 		EdgeGraph eg = new EdgeGraphAdapter(g);
@@ -164,6 +178,7 @@ public class Main {
 		Edge f = new Edge("a", "c");
 		Edge h = new Edge("b", "a");
 		Edge i = new Edge("c", "d");
+		Edge j = new Edge("d", "e");
 
 		eg.addEdge(e);
 		eg.addEdge(f);
@@ -172,13 +187,23 @@ public class Main {
 
 		List<Edge> path = new ArrayList<Edge>();
 		List<Edge> pathEmpty = new ArrayList<Edge>();
+		List<Edge> badPath = new ArrayList<Edge>();
+		
 		path.add(f);
 		assert eg.hasPath(path);
 		assert eg.hasPath(pathEmpty);
 		path.add(i);
 		assert eg.hasPath(path);
+		path.add(j);
+		assert !eg.hasPath(path);
+		eg.addEdge(j);
+		assert eg.hasPath(path);
+
+		badPath.add(e);
+		badPath.add(f);
 	}
 
+	// test connected
 	public static void test7(){
 		Graph g = new ListGraph();
 		
@@ -197,6 +222,34 @@ public class Main {
 		assert !g.connected("b", "c");
 		assert !g.connected("b", "d");
 	}
+
+	public static void test8(){
+		Graph g = new ListGraph();
+		Graph g1 = new ListGraph();
+		EdgeGraph eg = new EdgeGraphAdapter(g);
+		EdgeGraph eg1 = new EdgeGraphAdapter(g1);
+
+		Edge e = new Edge("a", "b");
+		Edge f = new Edge("a", "c");
+		Edge h = new Edge("b", "a");
+		Edge i = new Edge("c", "d");
+		Edge j = new Edge("d", "e");
+
+		assert eg.addEdge(e);
+		assert eg.addEdge(h);
+		assert eg1.addEdge(f);
+
+		assert eg.union(eg1).edges().contains(e);
+		assert eg.union(eg1).edges().contains(h);
+		assert eg.union(eg1).edges().contains(f);
+		assert eg.union(eg1).hasNode("c");
+
+		assert eg.addEdge(i);
+		List<Edge> path = new ArrayList<Edge>();
+		path.add(f);
+		path.add(i);
+		assert eg.union(eg1).hasPath(path);
+	}
 	
     
     public static void main(String[] args) {
@@ -207,6 +260,7 @@ public class Main {
 	test5();
 	test6();
 	test7();
+	test8();
     }
 
 }

@@ -102,6 +102,7 @@ public class EdgeGraphAdapter implements EdgeGraph {
           if (i.getDst() != j.getSrc()){
             throw new BadPath();
           }
+          i = j;
         }
         return true;
        }
