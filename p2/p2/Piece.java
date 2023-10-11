@@ -16,12 +16,19 @@ abstract public class Piece {
         Character name_color = name.charAt(0);
         Character name_piece = name.charAt(1);
         
-        // do we need to check for bad colors?
-        if (name_color.equals('w')){
-            return mapChar.get(name_piece).create(Color.WHITE);
-        }
-        else{
-            return mapChar.get(name_piece).create(Color.BLACK);
+        // check to make sure the supplied character for a piece is valid/been registered
+        if (mapChar.containsKey(name_piece)){
+            if (name_color.equals('w')){
+                return mapChar.get(name_piece).create(Color.WHITE);
+            }
+            else if (name_color.equals('b')){
+                return mapChar.get(name_piece).create(Color.BLACK);
+            }
+            else{
+                throw new RuntimeException("Not a valid color.");
+            }
+        }else{
+            throw new RuntimeException("Piece has not been registered.");
         }
     }
 
