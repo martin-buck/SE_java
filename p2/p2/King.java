@@ -19,6 +19,7 @@ public class King extends Piece {
     public List<String> moves(Board b, String loc) {
         List<String> validMoves = new ArrayList<String>();
         List<String> cols_list = Arrays.asList(Board.cols);
+
         String loc_col = loc.substring(0,1);
         String loc_row = loc.substring(1, 2);
         

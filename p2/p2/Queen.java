@@ -44,6 +44,7 @@ public class Queen extends Piece {
                 String new_loc_str = new_col_str + new_row_str;
                 Boolean blocked = b.getPiece(new_loc_str) != null;
 
+                // we break the loop because we should not continue in this direction if a piece is in the way
                 if (blocked && b.getPiece(new_loc_str).color() != this.color()){
                     validMoves.add(new_loc_str);
                     break;
@@ -72,6 +73,7 @@ public class Queen extends Piece {
                 String new_loc_str = new_col_str + new_row_str;
                 Boolean blocked = b.getPiece(new_loc_str) != null;
 
+                // we break the loop because we should not continue in this direction if a piece is in the way
                 if (blocked && b.getPiece(new_loc_str).color() != this.color()){
                     validMoves.add(new_loc_str);
                     break;
@@ -100,6 +102,7 @@ public class Queen extends Piece {
                 String new_loc_str = new_col_str + new_row_str;
                 Boolean blocked = b.getPiece(new_loc_str) != null;
 
+                // we break the loop because we should not continue in this direction if a piece is in the way
                 if (blocked && b.getPiece(new_loc_str).color() != this.color()){
                     validMoves.add(new_loc_str);
                     break;
@@ -127,6 +130,7 @@ public class Queen extends Piece {
                 String new_loc_str = new_col_str + new_row_str;
                 Boolean blocked = b.getPiece(new_loc_str) != null;
 
+                // we break the loop because we should not continue in this direction if a piece is in the way
                 if (blocked && b.getPiece(new_loc_str).color() != this.color()){
                     validMoves.add(new_loc_str);
                     break;
@@ -156,6 +160,7 @@ public class Queen extends Piece {
                 String new_loc_str = new_col_str + new_row_str;
                 Boolean blocked = b.getPiece(new_loc_str) != null;
 
+                // we break the loop because we should not continue in this direction if a piece is in the way
                 if (blocked && b.getPiece(new_loc_str).color() != this.color()){
                     validMoves.add(new_loc_str);
                     break;
@@ -185,6 +190,7 @@ public class Queen extends Piece {
                 String new_loc_str = new_col_str + new_row_str;
                 Boolean blocked = b.getPiece(new_loc_str) != null;
 
+                // we break the loop because we should not continue in this direction if a piece is in the way
                 if (blocked && b.getPiece(new_loc_str).color() != this.color()){
                     validMoves.add(new_loc_str);
                     break;
@@ -214,6 +220,7 @@ public class Queen extends Piece {
                 String new_loc_str = new_col_str + new_row_str;
                 Boolean blocked = b.getPiece(new_loc_str) != null;
 
+                // we break the loop because we should not continue in this direction if a piece is in the way
                 if (blocked && b.getPiece(new_loc_str).color() != this.color()){
                     validMoves.add(new_loc_str);
                     break;
@@ -243,6 +250,7 @@ public class Queen extends Piece {
                 String new_loc_str = new_col_str + new_row_str;
                 Boolean blocked = b.getPiece(new_loc_str) != null;
 
+                // we break the loop because we should not continue in this direction if a piece is in the way
                 if (blocked && b.getPiece(new_loc_str).color() != this.color()){
                     validMoves.add(new_loc_str);
                     break;

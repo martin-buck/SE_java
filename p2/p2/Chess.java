@@ -44,7 +44,7 @@ public class Chess {
 			String line = lines.nextLine();
 
 			// disallow xn=cp1 and xn=cp2
-			if (line.charAt(0) == '#' || line.isEmpty()){
+			if (line.isEmpty() || line.charAt(0) == '#'){
 				continue;
 			}
 			else if (pos.contains(line.substring(0, 2))){
@@ -68,6 +68,9 @@ public class Chess {
 					Board.theBoard().addPiece(p, String.valueOf(char0) + String.valueOf(char1));
 					pos.add(line.substring(0, 2));
 					continue;
+				}
+				else{
+					throw new RuntimeException("File contains an invalid layout format. Must be of the form: xn=cp");
 				}
 			}
 			else{
@@ -98,12 +101,16 @@ public class Chess {
 				char char3 = line.charAt(3);
 				char char4 = line.charAt(4);
 
+				// check that the five characters match the required format
 				if (cols.contains(String.valueOf(char0)) &&
 				rows.contains(String.valueOf(char1)) && 
 				char2 == '-' &&
 				cols.contains(String.valueOf(char3)) &&
 				rows.contains(String.valueOf(char4))){
 					Board.theBoard().movePiece(String.valueOf(char0) + String.valueOf(char1), String.valueOf(char3) + String.valueOf(char4));
+				}
+				else{
+					throw new RuntimeException("File contains an invalid layout format. Must be of the form: xn=cp");
 				}
 			}
 			else{

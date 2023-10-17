@@ -11,6 +11,20 @@ public class Test {
         Piece.registerPiece(new PawnFactory());
         Piece p = Piece.createPiece("wp");
         b.addPiece(p, "a3");
+
+        // text invalid loc
+        try {
+            b.movePiece("a3", "a5");
+            assert false;
+        } catch (RuntimeException e) {
+            assert e.getMessage().equals("Invalid move for this piece.");
+        }
+        try {
+            b.movePiece("a3", "b5");
+            assert false;
+        } catch (RuntimeException e) {
+            assert e.getMessage().equals("Invalid move for this piece.");
+        }
         
         // text that blank board spaces return null before and after a move
         assert b.getPiece("a3") == p;
@@ -20,6 +34,13 @@ public class Test {
         assert b.getPiece("a4") == p;
         b.clear();
         assert b.getPiece("a4") == null;
+
+        // test weird pawn moves
+        Piece p1 = Piece.createPiece("bp");
+        b.addPiece(p, "a2");
+        b.addPiece(p1, "b3");
+        b.movePiece("a2", "b3");
+        assert b.getPiece("b3") == p;
     }
 
     public static void testKing(){
@@ -351,15 +372,42 @@ public class Test {
     }
 
     public static void testKnight(){
+        // test that there is only one instance of a board
         Board b = Board.theBoard();
+        Board c = Board.theBoard();
+        assert c == b;
+
+        // clear board
         b.clear();
         Piece.registerPiece(new KnightFactory());
         Piece p = Piece.createPiece("wn");
         b.addPiece(p, "h8");
-        b.registerListener(new Logger());
+        Logger log1 = new Logger();
+        Logger log2 = new Logger();
 
+        b.registerListener(log1);
+        b.registerListener(log2);
         b.movePiece("h8", "g6");
+
+        // test weird knight moves and hops
+        Piece p1 = Piece.createPiece("bk");
+        Piece p2 = Piece.createPiece("wp");
+        b.addPiece(p1, "f4");
+        b.addPiece(p2, "g5");
+        b.movePiece("g6", "f4");
+
+        // test removing a single listener
+        b.removeListener(log2);
+        b.addPiece(p2, "h4");
+        b.movePiece("f4", "h5");
     }
+
+    // test different inputs to Chess.java
+    public static void testChess(){
+        // not sure how to test this but it throws correct exceptions
+    }
+
+    // test new Piece
 
     public static void main(String[] args) {
 	    testPawn();

@@ -36,74 +36,90 @@ public class Board {
         }
     }
 
-    // Returns piece at given loc or null if no such piece
-    // exists
+    // Returns piece at given loc or null if no such piece exists
     public Piece getPiece(String loc) {
-        // col should be in the range a-h and row should be in the range 1-8
-        String col = loc.substring(0,1);
-        String row = loc.substring(1, 2);
+        // ensure the input is at least the right length
+        if (loc.length() == 2){
+            // col should be in the range a-h and row should be in the range 1-8
+            String col = loc.substring(0,1);
+            String row = loc.substring(1, 2);
 
-        // if the input loc is invalid throw an exception
-        if (indeces.get(col) == null || rows_trans.indexOf(row) == -1){
-            throw new RuntimeException("Invalid position.");
+            // if the input loc is invalid throw an exception
+            if (indeces.get(col) == null || rows_trans.indexOf(row) == -1){
+                throw new RuntimeException("Invalid position.");
+            }
+
+            // otherwise return null or the piece at loc
+            return this.pieces[indeces.get(col)][rows_trans.indexOf(row)];
         }
-
-        // otherwise return null or the piece at loc
-        return this.pieces[indeces.get(col)][rows_trans.indexOf(row)];
+        else{
+            throw new RuntimeException("Input must be a length two string.");
+        }
     }
 
     public void addPiece(Piece p, String loc) {
-        String col = loc.substring(0,1);
-        String row = loc.substring(1, 2);
+        // make sure the string is the right length
+        if (loc.length() == 2){
+            String col = loc.substring(0,1);
+            String row = loc.substring(1, 2);
 
-        if (indeces.get(col) == null || rows_trans.indexOf(row) == -1 || this.getPiece(loc) != null){
-            throw new RuntimeException("Invalid position or position is occupied.");
+            if (indeces.get(col) == null || rows_trans.indexOf(row) == -1 || this.getPiece(loc) != null){
+                throw new RuntimeException("Invalid position or position is occupied.");
+            }
+
+            this.pieces[indeces.get(col)][rows_trans.indexOf(row)] = p;
+        }else{
+            throw new RuntimeException("Input must be a length two string.");
         }
-
-        this.pieces[indeces.get(col)][rows_trans.indexOf(row)] = p;
     }
 
     public void movePiece(String from, String to) {
-        String from_col = from.substring(0,1);
-        String from_row = from.substring(1, 2);
+        // make sure the strings are the right length
+        if (from.length() == 2 && to.length() == 2){
+            String from_col = from.substring(0,1);
+            String from_row = from.substring(1, 2);
 
-        String to_col = to.substring(0,1);
-        String to_row = to.substring(1, 2);
+            String to_col = to.substring(0,1);
+            String to_row = to.substring(1, 2);
 
-        // throw exceptions if positions are invalid or there is no piece to move
-        if (indeces.get(from_col) == null || rows_trans.indexOf(from_row) == -1 || this.getPiece(from) == null){
-            throw new RuntimeException("Invalid starting position or there is no piece in this position.");
-        }
-        if (indeces.get(to_col) == null || rows_trans.indexOf(to_row) == -1){
-            throw new RuntimeException("Invalid finishing position.");
-        }
-
-        // check if move is valid
-        Piece p = this.getPiece(from);
-        Color p_color = p.color();
-        List<String> moves = p.moves(Board.theBoard(), from);
-        if (moves.contains(to)){
-            // notify listeners depending on the state of the 'to' position
-            Piece captured = this.getPiece(to);
-            if (captured == null){
-                for (BoardListener l : listeners){
-                    l.onMove(from, to, p);
-                }
-            } 
-            else if (captured.color() != p_color){
-                for (BoardListener l : listeners){
-                    l.onMove(from, to, p);
-                    l.onCapture(p, captured);
-                }
+            // throw exceptions if positions are invalid or there is no piece to move
+            if (indeces.get(from_col) == null || rows_trans.indexOf(from_row) == -1 || this.getPiece(from) == null){
+                throw new RuntimeException("Invalid starting position or there is no piece in this position.");
+            }
+            if (indeces.get(to_col) == null || rows_trans.indexOf(to_row) == -1){
+                throw new RuntimeException("Invalid finishing position.");
             }
 
-            // makes the position that the piece started at empty/null and set 'to' position to have the piece there
-            this.pieces[indeces.get(from_col)][rows_trans.indexOf(from_row)] = null;
-            this.pieces[indeces.get(to_col)][rows_trans.indexOf(to_row)] = null;
-            this.addPiece(p, to);
+            // check if move is valid
+            Piece p = this.getPiece(from);
+            Color p_color = p.color();
+            List<String> moves = p.moves(Board.theBoard(), from);
+            if (moves.contains(to)){
+                // notify listeners depending on the state of the 'to' position
+                Piece captured = this.getPiece(to);
+                if (captured == null){
+                    for (BoardListener l : listeners){
+                        l.onMove(from, to, p);
+                    }
+                } 
+                else if (captured.color() != p_color){
+                    for (BoardListener l : listeners){
+                        l.onMove(from, to, p);
+                        l.onCapture(p, captured);
+                    }
+                }
+
+                // makes the position that the piece started at empty/null and set 'to' position to have the piece there
+                this.pieces[indeces.get(from_col)][rows_trans.indexOf(from_row)] = null;
+                this.pieces[indeces.get(to_col)][rows_trans.indexOf(to_row)] = null;
+                this.addPiece(p, to);
+            }
+            else{
+                throw new RuntimeException("Invalid move for this piece.");
+            }
         }
         else{
-            throw new RuntimeException("Invalid move for this piece.");
+            throw new RuntimeException("Inputs must be length two strings.");
         }
     }
 
