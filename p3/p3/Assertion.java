@@ -1,15 +1,15 @@
 public class Assertion {
     /* You'll need to change the return type of the assertThat methods */
-    static Object assertThat(Object o) {
-	throw new UnsupportedOperationException();
+    static AssertThatObject assertThat(Object o) {
+        return new AssertThatObject(o);
     }
-    static Object assertThat(String s) {
-	throw new UnsupportedOperationException();
+    static AssertThatString assertThat(String s) {
+        return new AssertThatString(s);
     }
-    static Object assertThat(boolean b) {
-	throw new UnsupportedOperationException();
+    static AssertThatBoolean assertThat(boolean b) {
+        return new AssertThatBoolean(b);
     }
-    static Object assertThat(int i) {
-	throw new UnsupportedOperationException();
+    static AssertThatInt assertThat(int i) {
+        return new AssertThatInt(i);
     }
 }
