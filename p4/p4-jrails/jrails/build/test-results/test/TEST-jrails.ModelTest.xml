@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="jrails.ModelTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2023-11-22T04:53:34" hostname="DESKTOP-OUMND1G" time="0.098">
+  <properties/>
+  <testcase name="testList" classname="jrails.ModelTest" time="0.039"/>
+  <testcase name="all_destroy" classname="jrails.ModelTest" time="0.029"/>
+  <testcase name="save_find" classname="jrails.ModelTest" time="0.028"/>
+  <system-out><![CDATA[id,num_copies,author,title
+884072,10,Michael Jackson,Zombies
+4
+4
+743431,1,Janet Jackson,Mummies
+4
+4
+id,num_copies,author,title
+884072,10,Michael Jackson,Zombies
+4
+4
+743431,1,Janet Jackson,Mummies
+4
+4
+4
+4
+4
+4
+4
+4
+4
+4
+4
+4
+
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
