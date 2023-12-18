@@ -1,0 +1,13 @@
+There are two classes that implement Runnable, P_thread and T_thread. 
+
+Within each are a run() method. Within each run method a lock is obtained on a Station via synchronize().
+
+For the T_thread, representing a Train, that lock waits until the next Station is free. Then T_thread
+obtains the lock for the current Station. Afterwards, for both locks, notifyall() is called.
+
+For the P_thread, representing a Passenger, if they are at a station waiting then the lock for the
+current station is obtained. If they are on a train, then the lock for the next station on their
+journey is obtained. In both cases, wait() is called until the right train or station is available.
+Finally, notifyAll() is called after locks are released.
+
+Unfortunately, there seems to be deadlock as the program runs out of time on Gradescope.

@@ -164,11 +164,11 @@ public class P_thread implements Runnable {
                     throw new RuntimeException("Passenger is on a train but journey is all true.");
                 }
 
-                synchronized (next_station){
+                synchronized (this.next_station){
                     boolean deboard_station = this.mbta_state.get(next_station).contains(curr_train);
                     while(!deboard_station){
                         try {
-                            next_station.wait();
+                            this.next_station.wait();
                             //System.out.println("Lock: Passenger " + this.p + " is waiting and has released lock " + next_station);
                         } catch (InterruptedException exc) {
                             throw new RuntimeException("InterruptedException for next_station.wait() in P_thread:"+ exc.getMessage());
@@ -191,7 +191,6 @@ public class P_thread implements Runnable {
                     this.pass_state.put(p, curr_pass_journey);
                     this.mbta.set_pass_state(pass_state);
 
-                    // log
                     //System.out.println("Lock: Passenger " + this.p + " is waking threads and has released lock " + next_station);
                     this.log.passenger_deboards(this.p, curr_train, next_station);
 

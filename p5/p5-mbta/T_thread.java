@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class T_thread implements Runnable {
     private Train t; 
@@ -16,6 +15,8 @@ public class T_thread implements Runnable {
     private Station next_station = null;
     private List<Station> this_line = null;
     private String color = null;
+    Station curr_station_up = null;
+    Station next_station_up = null;
     
     public T_thread(Train t, MBTA mbta, Log log){
         this.t = t;
@@ -73,7 +74,6 @@ public class T_thread implements Runnable {
         // run a while loop until passengers have reached their destinations; iterate over Booleans
         while (this.run_thread){            
             // move the train from curr_station to next_station by updating mbta_state. Check to make sure there is no train there
-            // SYNCHRONIZE ON THIS STATION OR NEXT STATION?
             synchronized (this.next_station){
                 //System.out.println("Lock: Train " + this.t + " has lock " + this.next_station);
                 boolean next_station_free = true;
@@ -102,76 +102,75 @@ public class T_thread implements Runnable {
                         }
                     }
                 }
-
-                if (next_station_free){
-                    // SYNCHRONIZE HERE?
-                    synchronized (curr_station){
-                        ArrayList<Entity> curr_station_state = this.mbta_state.get(curr_station);
-                        boolean state_curr = curr_station_state.remove(this.t);
-                        this.mbta_state.put(curr_station, curr_station_state);
-                        this.mbta.set_state(this.mbta_state);
-                        if (!state_curr){
-                            throw new RuntimeException("Could not remove train from curr_station because it is not in the Entity list.");
-                        }
-                        curr_station.notifyAll();
-                    }
-                    ArrayList<Entity> next_station_state = this.mbta_state.get(this.next_station);
-                    boolean state_next = next_station_state.add(this.t);
-                    this.mbta_state.put(this.next_station, next_station_state);
-                    this.mbta.set_state(this.mbta_state);
-                    if (!state_next){
-                        throw new RuntimeException("Could not add train to curr_station.");
-                    }
-                    this.log.train_moves(this.t, curr_station, next_station);
-
-                    // update train_journeys
-                    ArrayList<Station> new_stations = new ArrayList<Station>();
-                    Station curr_station_up = null;
-                    Station next_station_up = null;
-                    int count = 0;
-                    // the train is currently at this.next_station
-                    for (Station station : this_line){
-                        if (station.equals(this.next_station)){
-                            // if we are at the beginning of the line moving up
-                            if (count == 0 && curr_station.equals(this_line.get(count + 1))){
-                                curr_station_up = next_station;
-                                next_station_up = this_line.get(count + 1);
-                                break;
-                            // if we are at the end of the line moving down
-                            } else if (count == this_line.size()-1 && curr_station.equals(this_line.get(count - 1))){
-                                curr_station_up = next_station;
-                                next_station_up = this_line.get(count - 1);
-                                break;
-                            } else if (curr_station.equals(this_line.get(count - 1))){
-                                curr_station_up = next_station;
-                                next_station_up = this_line.get(count + 1);
-                                break;
-                            } else if (curr_station.equals(this_line.get(count + 1))){
-                                curr_station_up = next_station;
-                                next_station_up = this_line.get(count - 1);
-                                break;
-                            }
-                        }
-                        count = count + 1;
-                    }
-                    if (curr_station_up == null || next_station_up == null){
-                        throw new RuntimeException("Stations failed to update in T_thread.");
-                    }
-                    new_stations.add(0, curr_station_up);
-                    new_stations.add(1, next_station_up);
-                    this.train_journeys.put(this.t, new_stations);
-                    this.mbta.set_train_journeys(train_journeys);
-                    this.next_station.notifyAll();
-                    this.curr_station = curr_station_up;
-                    this.next_station = next_station_up;
-
-                    //System.out.println("Lock: Train " + this.t + " is waking all other threads using lock " + this.curr_station);
+                synchronized (this.curr_station){
+                ArrayList<Entity> curr_station_state = this.mbta_state.get(this.curr_station);
+                boolean state_curr = curr_station_state.remove(this.t);
+                this.mbta_state.put(this.curr_station, curr_station_state);
+                this.mbta.set_state(this.mbta_state);
+                if (!state_curr){
+                    throw new RuntimeException("Could not remove train from curr_station because it is not in the Entity list.");
                 }
-                else{
-                    //System.out.println("Lock: Train " + this.t + " is waking all other threads using lock " + this.next_station);
-                    this.next_station.notifyAll();
+                ArrayList<Entity> next_station_state = this.mbta_state.get(this.next_station);
+                boolean state_next = next_station_state.add(this.t);
+                this.mbta_state.put(this.next_station, next_station_state);
+                this.mbta.set_state(this.mbta_state);
+                if (!state_next){
+                    throw new RuntimeException("Could not add train to curr_station.");
                 }
+                this.log.train_moves(this.t, curr_station, next_station);
+                this.curr_station.notifyAll();
+                }
+                // update train_journeys
+                ArrayList<Station> new_stations = new ArrayList<Station>();
+                int count = 0;
+                // the train is currently at this.next_station
+                for (Station station : this_line){
+                    if (station.equals(this.next_station)){
+                        // if we are at the beginning of the line moving up
+                        if (count == 0 && curr_station.equals(this_line.get(count + 1))){
+                            curr_station_up = next_station;
+                            next_station_up = this_line.get(count + 1);
+                            break;
+                        // if we are at the end of the line moving down
+                        } else if (count == this_line.size()-1 && curr_station.equals(this_line.get(count - 1))){
+                            curr_station_up = next_station;
+                            next_station_up = this_line.get(count - 1);
+                            break;
+                        } else if (curr_station.equals(this_line.get(count - 1))){
+                            curr_station_up = next_station;
+                            next_station_up = this_line.get(count + 1);
+                            break;
+                        } else if (curr_station.equals(this_line.get(count + 1))){
+                            curr_station_up = next_station;
+                            next_station_up = this_line.get(count - 1);
+                            break;
+                        }
+                    }
+                    count = count + 1;
+                }
+                if (curr_station_up == null || next_station_up == null){
+                    throw new RuntimeException("Stations failed to update in T_thread.");
+                }
+                new_stations.add(0, curr_station_up);
+                new_stations.add(1, next_station_up);
+
+
+                this.train_journeys.put(this.t, new_stations);
+                this.mbta.set_train_journeys(train_journeys);
+                //this.curr_station = curr_station_up;
+                //this.next_station = next_station_up;
+                this.next_station.notifyAll();
+
+
+                //System.out.println("Lock: Train " + this.t + " is waking all other threads using lock " + this.curr_station);
             }
+            
+
+            if (curr_station_up != null && next_station_up != null){
+                this.curr_station = curr_station_up;
+                this.next_station = next_station_up;
+            }
+
             try {
                 //System.out.println("Lock: Train " + this.t + " is sleeping at " + this.curr_station);
                 Thread.sleep(10);
